@@ -1,4 +1,4 @@
-package main
+package dwnld
 
 import "net/url"
 
