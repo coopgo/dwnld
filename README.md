@@ -5,11 +5,11 @@ dwnld is a go library for downloading files over http/https or ftp. You can down
 ## Example
 
 ```go
-urls := ["https://speed.hetzner.de/100MB.bin", "https://speed.hetzner.de/1GB.bin", "ftp://speedtest.tele2.net/10MB.zip"]
+urls := []string{"https://speed.hetzner.de/100MB.bin", "https://speed.hetzner.de/1GB.bin", "ftp://speedtest.tele2.net/10MB.zip"}
 
 // Create a new downloader manager with configuration
-// Here we configure it to download all urls concurently 
-dwnlder := dwnld.New(NewWithMaxConcurrency(-1)) 
+// Here we configure it to download all urls concurently
+dwnlder := dwnld.New(dwnld.NewWithMaxConcurrency(-1))
 
 // We start the download
 infos := dwnlder.Download(urls...)

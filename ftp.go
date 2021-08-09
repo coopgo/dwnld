@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"net/url"
+	"path"
 	"time"
 
 	"github.com/jlaffaye/ftp"
@@ -32,6 +33,8 @@ func (rs *resource) getFtpSrc() (io.ReadCloser, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	rs.name = path.Base(ft.Filepath)
 
 	return c.Retr(ft.Filepath)
 }
