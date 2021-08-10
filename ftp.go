@@ -34,7 +34,13 @@ func (rs *resource) getFtpSrc() (io.ReadCloser, error) {
 		return nil, err
 	}
 
+	size, err := c.FileSize(ft.Filepath)
+	if err != nil {
+		return nil, err
+	}
+
 	rs.name = path.Base(ft.Filepath)
+	rs.size = size
 
 	return c.Retr(ft.Filepath)
 }
