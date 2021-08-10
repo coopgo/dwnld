@@ -50,7 +50,7 @@ func printComplete(rs resource, pad int) string {
 
 	// If the download is too fast it is possible that the start has not been set
 	dur := time.Duration(0)
-	if rs.start.Equal(time.Time{}) {
+	if !rs.start.Equal(time.Time{}) {
 		dur = rs.end.Sub(rs.start)
 	}
 
