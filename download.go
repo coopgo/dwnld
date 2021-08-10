@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/coopgo/dwnld/writer"
@@ -20,6 +21,8 @@ type Downloader struct {
 	// positive is max number of concurrent download
 	// negative is no limit to concurrent download
 	MaxConcurrency int
+
+	NoConflict bool
 
 	RefreshRate time.Duration
 }
@@ -54,6 +57,7 @@ func (dwnlder Downloader) Download(urls ...string) []Info {
 		rss[i].path = dwnlder.Path
 		rss[i].url = urls[i]
 		rss[i].ch = make(chan status, 1)
+		rss[i].nc = dwnlder.NoConflict
 	}
 
 	// Determine the number of worker
@@ -175,6 +179,8 @@ type resource struct {
 	written int64
 	status  code
 
+	nc bool
+
 	start time.Time
 	end   time.Time
 
@@ -199,7 +205,12 @@ func (rs *resource) download() {
 	}
 	defer src.Close()
 
+	if rs.nc {
+		rs.updateNameNoConflict()
+	}
+
 	p := path.Join(rs.path, rs.name)
+
 	out, err := os.Create(p)
 	if err != nil {
 		// we try to change the name
@@ -229,6 +240,22 @@ func (rs *resource) download() {
 	}
 
 	rs.ch <- status{name: rs.name, code: 2, size: rs.size}
+}
+
+func (rs *resource) updateNameNoConflict() {
+
+	for {
+		p := path.Join(rs.path, rs.name)
+
+		if _, err := os.Stat(p); err == nil {
+			// path exists
+			n := rs.name[:len(rs.name)-len(filepath.Ext(rs.name))]
+			n = n + "_1"
+			rs.name = n + filepath.Ext(rs.name)
+		} else {
+			return
+		}
+	}
 }
 
 func (rs *resource) getSrc() (io.ReadCloser, error) {

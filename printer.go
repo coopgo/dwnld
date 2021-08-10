@@ -35,7 +35,10 @@ func printDwnld(rs resource, pad int) string {
 
 		return fmt.Sprintf("%s Downloading %s [start %s]", header, printByte(rs.written), formatDuration(dur))
 	} else {
-		remaining := time.Duration((float64(dur) / float64(rs.written)) * float64((rs.size - rs.written)))
+		remaining := time.Duration(0)
+		if rs.written != 0 {
+			remaining = time.Duration((float64(dur) / float64(rs.written)) * float64(rs.size-rs.written))
+		}
 		return fmt.Sprintf("%s Downloading %s / %s [etr %s]", header, printByte(rs.written), printByte(rs.size), formatDuration(remaining))
 	}
 
@@ -45,7 +48,11 @@ func printComplete(rs resource, pad int) string {
 	tl := 33
 	header := fmt.Sprintf("[%*s] %-*s:", tl, truncate(rs.url, tl), pad, rs.name)
 
-	dur := rs.end.Sub(rs.start)
+	// If the download is too fast it is possible that the start has not been set
+	dur := time.Duration(0)
+	if rs.start.Equal(time.Time{}) {
+		dur = rs.end.Sub(rs.start)
+	}
 
 	return fmt.Sprintf("%s Download complete [in %s]", header, formatDuration(dur))
 }

@@ -30,3 +30,9 @@ func NewWithRefreshRate(dur time.Duration) Option {
 		d.RefreshRate = dur
 	}
 }
+
+func NewWithNoConflict() Option {
+	return func(d *Downloader) {
+		d.NoConflict = true
+	}
+}
