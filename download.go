@@ -43,6 +43,7 @@ func New(opts ...Option) Downloader {
 type Info struct {
 	Name  string
 	Path  string
+	Url   string
 	Size  int64
 	Start time.Time
 	End   time.Time
@@ -139,6 +140,7 @@ func (dwnlder Downloader) Download(urls ...string) []Info {
 	for i := range infos {
 		infos[i] = Info{
 			Name:  rss[i].name,
+			Url:   rss[i].url,
 			Size:  rss[i].size,
 			Error: rss[i].err,
 			Start: rss[i].start,
